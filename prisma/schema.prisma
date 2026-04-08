@@ -16,3 +16,10 @@ model poi_type {
   id Int @id @default(autoincrement())
   name String @unique
 }
+
+model poi {
+    id Int @id @default(autoincrement())
+    name String @unique
+
+
+  }

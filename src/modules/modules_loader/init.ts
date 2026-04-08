@@ -5,7 +5,7 @@ import config from "./config.json" with { type: "json" }
 
 const ModulesLoader = {}
 
-ModulesLoader.Init = async() => {
+ModulesLoader.Init = async(client) => {
   const modules_path = join(import.meta.dirname, config.MODULES_PATH);
   const modules = readdirSync(modules_path);
 
@@ -18,7 +18,7 @@ ModulesLoader.Init = async() => {
     const md = moduleNamespace.default;
     
     if (md && typeof md.Init === "function") {
-      await md.Init();
+      await md.Init(client);
     } else {
       console.error(`Module at ${moduleURL} is missing an Init function!`);
     }

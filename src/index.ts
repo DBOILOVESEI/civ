@@ -1,10 +1,11 @@
-import * as dotenv from "dotenv"
-dotenv.config();
+import { config } from "dotenv"
 
 import { readdirSync } from "fs"
 import { join } from "path"
 import ModulesLoader from "./modules/modules_loader/init.ts"
 import { Client, Events, GatewayIntentBits } from "discord.js"
+
+config();
 
 const token = process.env.TOKEN;
 
@@ -14,16 +15,21 @@ const client = new Client({ intents: [
 ]});
 
 async function main() {
-  await ModulesLoader.Init();
+  try {
+    await client.login(token);
+    console.log("Login successful.")
+  } catch (error) {
+    console.log("Failed to login: ", error)
+  };
 
-  client.login(token);
+  await ModulesLoader.Init(client);
 };
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
-main()
+main();
 
 // MODULES
 const eventsPath = join(import.meta.dirname, "events");
