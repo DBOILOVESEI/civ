@@ -30,26 +30,3 @@ client.once(Events.ClientReady, (readyClient) => {
 });
 
 main();
-
-// MODULES
-const eventsPath = join(import.meta.dirname, "events");
-const eventFolders = readdirSync(eventsPath);
-
-for (const event of eventFolders) {
-  // Get event functions
-  const eventPath = join(eventsPath, event);
-  const eventFiles = readdirSync(eventPath);
-
-  client.on(event, async(...args) => {
-      for (const eventFunc of eventFiles) {
-        const funcPath = join(eventPath, eventFunc)
-
-        const module = await import (`file://${funcPath}`);
-        try {
-          await module.execute(client, ...args);
-        } catch (error) {
-            console.error(`Error executing ${eventFunc} for event ${event} in ${eventPath}.`)
-      };
-    };
-  });
-};
