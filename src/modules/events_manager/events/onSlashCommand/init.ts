@@ -3,8 +3,6 @@ Event.EventType = "interactionCreate";
 
 Event.Execute = async (client, interaction) => {
   if (!interaction.isChatInputCommand()) { return; };
-  
-  console.log("Executing command.")
 
   const command = interaction.client.Commands.get(interaction.commandName);
   if (!command) {
@@ -12,7 +10,6 @@ Event.Execute = async (client, interaction) => {
     return;
   };
 
-  
   try {
     await command.Execute(interaction);
 
