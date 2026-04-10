@@ -14,8 +14,8 @@ ModulesLoader.Init = async(client) => {
     
     const moduleURL = pathToFileURL(join(modules_path, moduleName, config.INIT_FILE)).href;
     
-    const moduleNamespace = await import(moduleURL);
-    const md = moduleNamespace.default;
+    const initFile = await import(moduleURL);
+    const md = initFile.default;
     
     if (md && typeof md.Init === "function") {
       await md.Init(client);
