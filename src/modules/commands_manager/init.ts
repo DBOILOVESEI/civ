@@ -16,7 +16,7 @@ const CommandsManager = {}
 CommandsManager.Commands = [];
 
 CommandsManager.Init = async (client) => {
-  client.commands = new Collection();
+  client.Commands = new Collection();
 
   const commandsPath = join(import.meta.dirname, config.COMMANDS_PATH);
   const commands_list = readdirSync(commandsPath);
@@ -32,7 +32,7 @@ CommandsManager.Init = async (client) => {
       CommandsManager.Commands.push(command.Data.toJSON());
 
       // Store in client
-      client.commands.set(command.Data.Name, command);
+      client.Commands.set(command.Name, command);
 
     } else {
       console.log(`[WANRING] Command ${commandName} at ${commandsPath} is missing Data or Execute field.`);
