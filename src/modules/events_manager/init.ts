@@ -9,8 +9,6 @@ const EventsManager = {};
 EventsManager.Events = new Collection();
 
 EventsManager.Init = async (client) => {
-  console.log("Loading event...");
-
   const eventsPath = join(import.meta.dirname, config.EVENTS_PATH);
   const events_list = readdirSync(eventsPath);
 

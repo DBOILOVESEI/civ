@@ -9,7 +9,6 @@ Command.Data.setName(Command.Name);
 Command.Data.setDescription(Command.Description);
 
 Command.Execute = async (interaction) => {
-  console.log("[PONG!]")
   await interaction.reply("Pong!");
 };
 

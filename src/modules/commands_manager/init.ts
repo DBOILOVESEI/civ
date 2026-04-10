@@ -57,7 +57,7 @@ CommandsManager.RegisterCommands = async () => {
         CLIENT_CONFIG.SERVER_ID),
       { body: CommandsManager.Commands}
     );
-    console.log(`Successfully refreshed ${commands_data} (/) commands.`)
+    console.log(`Successfully refreshed (/) commands.`)
 
   } catch (error) {
     console.log("Error registering commands: ", error);

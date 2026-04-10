@@ -8,7 +8,7 @@ Event.Execute = async (client, interaction) => {
 
   const command = interaction.client.Commands.get(interaction.commandName);
   if (!command) {
-    console.log(`[ERROR] Command ${interaction.commandName} does not exist.`);
+    console.log(`Command ${interaction.commandName} does not exist.`);
     return;
   };
 
