@@ -27,16 +27,22 @@ CommandsManager.Init = async (client) => {
     const initFile = await import(commandURL);
     const command = initFile.default;
     
-    if ("Data" in command && "Execute" in command) {
-      // Store in module
-      CommandsManager.Commands.push(command.Data.toJSON());
-
-      // Store in client
-      client.Commands.set(command.Name, command);
-
-    } else {
+    if (!("Data" in command) || !("Execute" in command)) {
       console.log(`[WANRING] Command ${commandName} at ${commandsPath} is missing Data or Execute field.`);
+      continue;
     };
+    
+    // Optional Init command
+    if ("Init" in command) {
+      command.Init(client);
+    };
+
+    // Store in module
+    CommandsManager.Commands.push(command.Data.toJSON());
+
+    // Store in client
+    client.Commands.set(command.Name, command);
+
   };
 
   await CommandsManager.RegisterCommands();
