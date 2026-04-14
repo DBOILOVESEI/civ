@@ -1,12 +1,42 @@
 const Table = {};
+Table.Statements = {};
+Table.Queries = {
+  CREATE_POI_TABLE: `
+    CREATE TABLE IF NOT EXISTS poi (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name STRING UNIQUE NOT NULL
+    )
+  `,
 
+  CREATE_POI: `
+    INSERT OR IGNORE INTO poi (name)
+    VALUES (@name)
+  `,
+
+  GET_ALL_POI: `
+    SELECT * FROM poi
+  `
+};
 Table.Init = async (client, database) => {
-  console.log("Hello!!!!!!")
+  Table.Database = database;
 
+  Table.Statements.CreatePOI = Table.Database.prepare(Table.Queries.CREATE_POI);
+  Table.Statements.GetAllPOI = Table.Database.prepare(Table.Queries.GET_ALL_POI);
+
+  Table.CreatePOI("Placeholder");
+  console.log(Table.GetAllPOI());
 };
 
-Table.IAmCoolHuiikStinks = async (client, database) => {
-  
+Table.CreatePOITable = async (client) => {
+  Table.Database.exec(Table.Queries.CREATE_POI_TABLE);
 };
+
+Table.CreatePOI = async (name: string) => {
+  return Table.Statements.CreatePOI.run( { name:name } );
+};
+
+Table.GetAllPOI = async () => {
+  return Table.Statements.GetAllPOI.all();
+}
 
 export default Table;

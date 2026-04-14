@@ -29,6 +29,10 @@ DatabaseManager.Init = async (client) => {
     table.Init(client, DatabaseManager.Database);
     for (const funcName in table) {
       if (config.INDEX_FUNCTION_IGNORE.includes(funcName)) {continue;};
+      
+      const func = table[funcName];
+      if (!(func === "function")) { continue; };
+
       console.log(funcName)
     };
   };
