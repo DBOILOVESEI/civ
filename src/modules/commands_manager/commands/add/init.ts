@@ -9,9 +9,28 @@ const Command = {};
 Command.Name = "add";
 Command.Description = "Add a new Point Of Interest";
 Command.Builder = new SlashCommandBuilder();
+Command.Subcommands = {};
 
 Command.Execute = async (interaction) => {
-  await interaction.reply("Man stfu");
+  const subcommandName = interaction.options.getSubcommand();
+
+  if (subcommandName) {
+    const subcommand = Command.Subcommands[subcommandName];
+    if (!subcommand) {
+      console.log(`Subcommand ${subcommandName} is not loaded in ${Command.Name}.`);
+      return;
+    };
+
+    if (!(subcommand.Execute)) {
+      console.log(`Subcommand ${subcommandName} does not have Execute method.`);
+      return;
+    }
+
+    subcommand.Execute(interaction);
+    return;
+  };
+
+  await interaction.reply("Somewthing went wrong.");
 };
 
 export default Command;

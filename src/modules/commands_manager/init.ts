@@ -34,6 +34,10 @@ CommandsManager.Init = async (client) => {
     // Load subcommands 
     const subcommandsPath = join(commandPath, config.SUBCOMMANDS_PATH);
     if (existsSync(subcommandsPath) === true) {
+      if (!command.Subcommands) {
+        command.Subcommands = {};
+      };
+
       const subcommands = readdirSync(subcommandsPath);
 
       for (const subcommandName of subcommands) {
@@ -44,7 +48,10 @@ CommandsManager.Init = async (client) => {
         if (subcommandBuilt === false) { continue; };
 
         command.Builder.addSubcommand(subcommand.Builder);
+
+        command.Subcommands[subcommand.Name] = subcommand;
       };
+
     };
 
     // Store in module
@@ -89,6 +96,8 @@ CommandsManager.BuildCommand = async (command, commandName) => {
       );
     };
   };
+
+  return true;
 };
 
 CommandsManager.RegisterCommands = async () => {

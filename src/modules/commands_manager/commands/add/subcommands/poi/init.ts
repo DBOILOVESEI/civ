@@ -14,8 +14,8 @@ Subcommand.Options = [
 ];
 
 Subcommand.Execute = async (interaction) => {
-  interaction.reply("This should add Point of Interest, but I haven't implemented it yet.")
-
+  const poi_name = interaction.options.getString("name");
+  interaction.reply(`${poi_name} shall be created.`);
 };
 
 export default Subcommand;
