@@ -1,7 +1,8 @@
 import { SlashCommandSubcommandBuilder } from "discord.js";
+import DatabaseManager from "../../../../../database_manager/init.ts";
 
 const Subcommand = {};
-Subcommand.Name = "poi";
+Subcommand.Name = "add";
 Subcommand.Description = "Add a new Point of Interest";
 Subcommand.Builder = new SlashCommandSubcommandBuilder();
 Subcommand.Options = [
@@ -15,7 +16,9 @@ Subcommand.Options = [
 
 Subcommand.Execute = async (interaction) => {
   const poi_name = interaction.options.getString("name");
-  interaction.reply(`${poi_name} shall be created.`);
+  DatabaseManager.CreatePOI(poi_name);
+
+  interaction.reply(`Created ${poi_name}.`);
 };
 
 export default Subcommand;

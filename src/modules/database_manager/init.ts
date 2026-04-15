@@ -13,8 +13,6 @@ DatabaseManager.Init = async (client) => {
   DatabaseManager.Database.pragma("foreign_keys = ON");
   DatabaseManager.Database.pragma("journal_mode = WAL")
   
-  console.log("Database initialization complete.")
-  
   const tablesPath = join(import.meta.dirname, config.TABLES_PATH);
   const tables = readdirSync(tablesPath);
   for (const tableModule of tables) {
@@ -27,11 +25,20 @@ DatabaseManager.Init = async (client) => {
     };
 
     table.Init(client, DatabaseManager.Database);
+
     for (const funcName in table) {
       if (config.INDEX_FUNCTION_IGNORE.includes(funcName)) {continue;};
       
       const func = table[funcName];
       if (!(typeof func === "function")) { continue; };
+
+      const existingFunc = DatabaseManager[funcName];
+      if (existingFunc) {
+        console.log(`Function ${funcName} already exists in DatabaseManager.`);
+        continue;
+      }
+
+      DatabaseManager[funcName] = table[funcName];
     };
   };
 

@@ -4,6 +4,8 @@ import { REST, Routes, Collection } from "discord.js";
 import { readdirSync, existsSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
+import utils from "./utils/init.ts";
+
 import CLIENT_CONFIG from "../../../config.json" with { type:"json" };
 import config from "./config.json" with { type:"json" };
 
@@ -63,6 +65,9 @@ CommandsManager.Init = async (client) => {
   };
 
   await CommandsManager.RegisterCommands();
+
+  // Other modules
+  utils.Init(client);
 };
 
 CommandsManager.BuildCommand = async (command, commandName) => {
