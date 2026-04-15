@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv"; dotenv.config();
 
 import { REST, Routes, Collection } from "discord.js";
-import { readdirSync } from "fs";
+import { readdirSync, existsSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 import CLIENT_CONFIG from "../../../config.json" with { type:"json" };
@@ -22,23 +22,33 @@ CommandsManager.Init = async (client) => {
   const commands_list = readdirSync(commandsPath);
 
   for (const commandName of commands_list) {
-    const commandURL = pathToFileURL(join(commandsPath, commandName, config.INIT_FILE)).href;
+    const commandPath = join(commandsPath, commandName);
+    const initPath = join(commandPath, config.INIT_FILE);
 
-    const initFile = await import(commandURL);
-    const command = initFile.default;
+    const commandURL = pathToFileURL(initPath).href;
+    const command = (await import(commandURL)).default;
     
-    if (!("Data" in command) || !("Execute" in command)) {
-      console.log(`[WANRING] Command ${commandName} at ${commandsPath} is missing Data or Execute field.`);
-      continue;
-    };
+    const commandBuilt = CommandsManager.BuildCommand(command);
+    if (commandBuilt === false) { continue; };
     
-    // Optional Init command
-    if ("Init" in command) {
-      command.Init(client);
+    // Load subcommands 
+    const subcommandsPath = join(commandPath, config.SUBCOMMANDS_PATH);
+    if (existsSync(subcommandsPath) === true) {
+      const subcommands = readdirSync(subcommandsPath);
+
+      for (const subcommandName of subcommands) {
+        const subcommandInitURL = pathToFileURL(join(subcommandsPath, subcommandName, config.INIT_FILE)).href;
+        const subcommand = (await import(subcommandInitURL)).default;
+        
+        const subcommandBuilt = CommandsManager.BuildCommand(subcommand);
+        if (subcommandBuilt === false) { continue; };
+
+        command.Builder.addSubcommand(subcommand.Builder);
+      };
     };
 
     // Store in module
-    CommandsManager.Commands.push(command.Data.toJSON());
+    CommandsManager.Commands.push(command.Builder.toJSON());
 
     // Store in client
     client.Commands.set(command.Name, command);
@@ -48,6 +58,39 @@ CommandsManager.Init = async (client) => {
   await CommandsManager.RegisterCommands();
 };
 
+CommandsManager.BuildCommand = async (command, commandName) => {
+  if (!("Name" in command) || !("Description" in command) || !("Builder" in command) || !("Execute" in command)) {
+      console.log(`[WANRING] Command ${commandName} is missing Builder or Execute field.`);
+      return false;
+  };
+
+  command.Builder.setName(command.Name);
+  command.Builder.setDescription(command.Description);
+
+  const options = command.Options;
+  if (options) {
+    for (const option of options) {
+      if (!("Type" in option) || !("Name" in option) || !("Description" in option)) {
+        console.log(`${option} missing required Type or Name or Description`);
+        continue;
+      };
+
+      const methodName = `add${option.Type}Option`;
+
+      if (typeof command.Builder[methodName] !== "function") {
+        console.log(`Invalid method ${methodName} detected for Command Option ${option.Name}`);
+        continue;
+      };
+
+      command.Builder[methodName](optionBuilder => optionBuilder
+        .setName(option.Name)
+        .setDescription(option.Description)
+        .setRequired(option.Required ?? false)
+      );
+    };
+  };
+};
+
 CommandsManager.RegisterCommands = async () => {
   if (CommandsManager.Commands.length < 1) {
     console.log("There are no commands loaded.");
@@ -55,8 +98,6 @@ CommandsManager.RegisterCommands = async () => {
   }
 
   try {
-    console.log(`Refreshing ${CommandsManager.Commands.length} (/) commands.`)
-
     const commands_data = rest.put(
       Routes.applicationGuildCommands(
         CLIENT_CONFIG.CLIENT_ID,

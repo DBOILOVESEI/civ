@@ -32,8 +32,6 @@ DatabaseManager.Init = async (client) => {
       
       const func = table[funcName];
       if (!(typeof func === "function")) { continue; };
-
-      console.log(funcName)
     };
   };
 
