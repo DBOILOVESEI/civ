@@ -65,6 +65,7 @@ DatabaseManager.SetUpTableModule = (table, database) => {
   for (const queryName in table.Queries) {
     const query = table.Queries[queryName];
 
+    // Creating Table uses exec()
     if (queryName.includes("Table")) {
       table.Database.exec(query);
       continue;
@@ -73,6 +74,7 @@ DatabaseManager.SetUpTableModule = (table, database) => {
     const statement = table.Database.prepare(query);
     table.Statements[queryName] = statement; 
 
+    // Get uses SELECT, which needs to use all()
     if (queryName.includes("Get")) {
       table[queryName] = (args: {[key: string]: any} | null) => {
         return args ? statement.all(args) : statement.all();
@@ -80,6 +82,7 @@ DatabaseManager.SetUpTableModule = (table, database) => {
       continue;
     };
 
+    // The rest of the commands use run()
     table[queryName] = (args: {[key: string]: any} | null) => {
       return args ? statement.run(args) : statement.run();
     };
