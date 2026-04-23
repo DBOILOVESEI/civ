@@ -35,12 +35,11 @@ DatabaseManager.Init = async (client) => {
 
     const table = (await import(moduleURL)).default;
 
-    if (!("Init" in table)) {
-      console.log(`TableModule ${tableModule} in ${tablesPath} is missing Init function.`)
-      return;
-    };
+    DatabaseManager.SetUpTableModule(table, DatabaseManager.Database);
 
-    table.Init(client, DatabaseManager.Database);
+    if ("Init" in table) {
+      table.Init(client, DatabaseManager.Database);
+    };
 
     for (const funcName in table) {
       if (config.INDEX_FUNCTION_IGNORE.includes(funcName)) {continue;};
@@ -58,6 +57,33 @@ DatabaseManager.Init = async (client) => {
     };
   };
 
+};
+
+DatabaseManager.SetUpTableModule = (table, database) => {
+  table.Database = database;
+
+  for (const queryName in table.Queries) {
+    const query = table.Queries[queryName];
+
+    if (queryName.includes("Table")) {
+      table.Database.exec(query);
+      continue;
+    };
+
+    const statement = table.Database.prepare(query);
+    table.Statements[queryName] = statement; 
+
+    if (queryName.includes("Get")) {
+      table[queryName] = (args: {[key: string]: any} | null) => {
+        return args ? statement.all(args) : statement.all();
+      };
+      continue;
+    };
+
+    table[queryName] = (args: {[key: string]: any} | null) => {
+      return args ? statement.run(args) : statement.run();
+    };
+  };
 };
 
 export default DatabaseManager;

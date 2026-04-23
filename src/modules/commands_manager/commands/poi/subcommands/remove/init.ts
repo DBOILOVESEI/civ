@@ -16,7 +16,9 @@ Subcommand.Options = [
 
 Subcommand.Execute = async (interaction) => {
   const poi_name = interaction.options.getString("name");
-  DatabaseManager.RemovePOI(poi_name);
+  DatabaseManager.RemovePOI({
+    name: poi_name
+  });
 
   interaction.reply(`Removed ${poi_name}.`);
 };

@@ -1,54 +1,37 @@
 const Table = {};
 Table.Statements = {};
 Table.Queries = {
-  CREATE_POI_TABLE: `
+  CreatePOITable: `
     CREATE TABLE IF NOT EXISTS poi (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name STRING UNIQUE NOT NULL
+      name STRING UNIQUE NOT NULL,
+      description STRING,
+      coordinate_x INTEGER,
+      coordinate_y INTEGER,
+      parent_poi_id INTEGER
+      
     )
   `,
 
-  CREATE_POI: `
+  CreatePOI: `
     INSERT OR IGNORE INTO poi (name)
     VALUES (@name)
   `,
 
-  REMOVE_POI: `
+  RemovePOI: `
     DELETE FROM poi
     WHERE name = (@name)
   `,
 
-  GET_ALL_POI: `
+  GetAllPOI: `
     SELECT * FROM poi
   `
 };
 Table.Init = async (client, database) => {
-  Table.Database = database;
-
-  Table.CreatePOITable();
-
-  Table.Statements.CreatePOI = Table.Database.prepare(Table.Queries.CREATE_POI);
-  Table.Statements.RemovePOI = Table.Database.prepare(Table.Queries.REMOVE_POI);
-  Table.Statements.GetAllPOI = Table.Database.prepare(Table.Queries.GET_ALL_POI);
-
-  Table.CreatePOI("Placeholder");
+  Table.CreatePOI({
+    name: "Placeholder"
+  });
   console.log(Table.GetAllPOI());
 };
-
-Table.CreatePOITable = () => {
-  Table.Database.exec(Table.Queries.CREATE_POI_TABLE);
-};
-
-Table.CreatePOI = (name: string) => {
-  return Table.Statements.CreatePOI.run( { name:name } );
-};
-
-Table.RemovePOI = (name: string) => {
-  return Table.Statements.RemovePOI.run( { name:name } );
-};
-
-Table.GetAllPOI = () => {
-  return Table.Statements.GetAllPOI.all();
-}
 
 export default Table;

@@ -16,7 +16,9 @@ Subcommand.Options = [
 
 Subcommand.Execute = async (interaction) => {
   const poi_name = interaction.options.getString("name");
-  DatabaseManager.CreatePOI(poi_name);
+  DatabaseManager.CreatePOI({
+    name: poi_name
+  });
 
   interaction.reply(`Created ${poi_name}.`);
 };
